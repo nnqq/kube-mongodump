@@ -30,8 +30,8 @@ spec:
                   port: 80
               resources:
                 requests:
-                  cpu: 15m
-                  memory: 15Mi
+                  cpu: 220m
+                  memory: 60Mi
                 limits:
                   cpu: "1"
                   memory: 1Gi
@@ -75,6 +75,11 @@ spec:
                   valueFrom:
                     configMapKeyRef:
                       key: url
+                      name: mongodb
+                - name: MONGODB_NUMPARALLELCOLLECTIONS
+                  valueFrom:
+                    configMapKeyRef:
+                      key: numparallelcollections
                       name: mongodb
                 - name: HEALTHZPORT
                   value: "80"

@@ -14,16 +14,18 @@ import (
 )
 
 type backup struct {
-	mongodbURL   string
-	backupBucket *minio.Bucket
-	logger       zerolog.Logger
+	mongodbURL             string
+	numParallelCollections int
+	backupBucket           *minio.Bucket
+	logger                 zerolog.Logger
 }
 
-func NewBackup(logger zerolog.Logger, mongodbURL string, backupBucket *minio.Bucket) *backup {
+func NewBackup(logger zerolog.Logger, mongodbURL string, numParallelCollections int, backupBucket *minio.Bucket) *backup {
 	return &backup{
-		mongodbURL:   mongodbURL,
-		backupBucket: backupBucket,
-		logger:       logger,
+		mongodbURL:             mongodbURL,
+		numParallelCollections: numParallelCollections,
+		backupBucket:           backupBucket,
+		logger:                 logger,
 	}
 }
 
@@ -63,7 +65,7 @@ func (b *backup) Do(ctx context.Context) error {
 			Archive:                archivePath,
 			Gzip:                   true,
 			Oplog:                  true,
-			NumParallelCollections: 5,
+			NumParallelCollections: b.numParallelCollections,
 		},
 		InputOptions: &mongodump.InputOptions{},
 	}

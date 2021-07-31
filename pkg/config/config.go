@@ -23,7 +23,8 @@ type s3 struct {
 }
 
 type mongodb struct {
-	URL string
+	URL                    string
+	NumParallelCollections int
 }
 
 func NewConfig() (Config, error) {
