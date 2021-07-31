@@ -1,0 +1,82 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: mongodump
+  labels:
+    app: mongodump
+spec:
+  concurrencyPolicy: Forbid
+  schedule: "0 0 * * 0"
+  jobTemplate:
+    metadata:
+      labels:
+        app: mongodump
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: mongodump
+              image: busybox
+              command:
+                - /app/servicebin
+              livenessProbe:
+                httpGet:
+                  path: /healthz
+                  port: 80
+              readinessProbe:
+                httpGet:
+                  path: /healthz
+                  port: 80
+              resources:
+                requests:
+                  cpu: 15m
+                  memory: 15Mi
+                limits:
+                  cpu: "1"
+                  memory: 1Gi
+              env:
+                - name: S3_BUCKETBACKUP
+                  valueFrom:
+                    configMapKeyRef:
+                      key: bucketbackup
+                      name: s3
+                - name: S3_BUCKETBACKUPTTLDAYS
+                  valueFrom:
+                    configMapKeyRef:
+                      key: bucketbackupttldays
+                      name: s3
+                - name: S3_ENDPOINT
+                  valueFrom:
+                    configMapKeyRef:
+                      key: endpoint
+                      name: s3
+                - name: S3_ACCESSKEYID
+                  valueFrom:
+                    configMapKeyRef:
+                      key: accesskeyid
+                      name: s3
+                - name: S3_SECRETACCESSKEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secretaccesskey
+                      name: s3
+                - name: S3_SECURE
+                  valueFrom:
+                    configMapKeyRef:
+                      key: secure
+                      name: s3
+                - name: S3_REGION
+                  valueFrom:
+                    configMapKeyRef:
+                      key: region
+                      name: s3
+                - name: MONGODB_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      key: url
+                      name: mongodb
+                - name: HEALTHZPORT
+                  value: "80"
+                - name: LOGLEVEL
+                  value: error
