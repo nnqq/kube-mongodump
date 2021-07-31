@@ -7,6 +7,7 @@ import (
 	"github.com/mongodb/mongo-tools/mongodump"
 	"github.com/nnqq/kube-mongodump/pkg/minio"
 	"github.com/rs/zerolog"
+	"go.mongodb.org/mongo-driver/x/mongo/driver/connstring"
 	"os"
 	"path"
 	"time"
@@ -41,10 +42,16 @@ func (b *backup) Do(ctx context.Context) error {
 		}
 	}()
 
+	uri, err := connstring.Parse(b.mongodbURL)
+	if err != nil {
+		return fmt.Errorf("connstring.Parse: %w", err)
+	}
+
 	md := &mongodump.MongoDump{
 		ToolOptions: &options.ToolOptions{
 			URI: &options.URI{
 				ConnectionString: b.mongodbURL,
+				ConnString:       uri,
 			},
 			Namespace: &options.Namespace{},
 			Auth:      &options.Auth{},
