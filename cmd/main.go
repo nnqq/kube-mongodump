@@ -44,7 +44,7 @@ func main() {
 		panic(err)
 	}
 
-	go healthz.NewHealthz(healthz.Logger(&logg), healthz.Addr("0.0.0.0:"+cfg.HealthzPort))
+	go healthz.NewHealthz(healthz.Logger(&logg), healthz.Addr("0.0.0.0:"+cfg.HealthzPort)).MustServe()
 	err = backup.NewBackup(logg, cfg.MongoDB.URL, backupBucket).Do(ctx)
 	if err != nil {
 		panic(err)
